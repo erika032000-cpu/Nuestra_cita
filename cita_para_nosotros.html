@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Una cita para nosotros ❤️</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; font-family:Georgia,serif;
+    background:linear-gradient(145deg,#fff5f6,#fbe8ed 55%,#fff);
+    color:#4b2932; display:flex; justify-content:center; padding:22px 14px;
+  }
+  .card{
+    width:min(620px,100%); background:rgba(255,255,255,.88);
+    border:1px solid #f2d5dc; border-radius:28px; padding:30px 22px 26px;
+    box-shadow:0 18px 55px rgba(116,45,65,.14); text-align:center;
+  }
+  .heart{font-size:42px; animation:pulse 1.8s infinite}
+  @keyframes pulse{50%{transform:scale(1.12)}}
+  h1{font-size:34px; margin:8px 0 8px; font-weight:500}
+  .subtitle{font-size:18px; line-height:1.55; margin:0 auto 24px; max-width:480px}
+  .section{margin-top:25px}
+  .section h2{font-size:22px;font-weight:500;margin:0 0 14px}
+  input[type=date]{
+    width:100%; max-width:360px; padding:15px 16px; border-radius:16px;
+    border:1px solid #e5bdc8; background:white; color:#4b2932; font-size:17px;
+  }
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .plan{
+    border:1px solid #ead0d7;background:#fffafb;border-radius:18px;
+    padding:16px 12px; cursor:pointer; transition:.2s; text-align:left;
+  }
+  .plan:hover{transform:translateY(-2px);box-shadow:0 7px 18px rgba(116,45,65,.10)}
+  .plan.selected{border:2px solid #a84d67;background:#fff0f3}
+  .emoji{font-size:25px}.name{font-size:16px;margin-top:7px}.desc{font:13px Arial,sans-serif;color:#76545e;margin-top:4px}
+  button{
+    margin-top:24px; border:0; border-radius:999px; padding:15px 25px;
+    background:#9d4661;color:white;font-size:17px;cursor:pointer;
+    box-shadow:0 8px 18px rgba(157,70,97,.25)
+  }
+  button:disabled{opacity:.45;cursor:not-allowed}
+  #result{display:none; margin-top:25px;padding:22px;border-radius:20px;background:#fff0f3;border:1px solid #efcbd5}
+  #result h2{margin:0 0 10px;font-weight:500}
+  .small{font:13px Arial,sans-serif;color:#76545e;margin-top:14px}
+  .footer{margin-top:22px;font-size:14px;color:#96727b}
+  @media(max-width:500px){.plans{grid-template-columns:1fr}h1{font-size:29px}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="heart">♡</div>
+  <h1>Una cita para nosotros</h1>
+  <p class="subtitle">
+    Tengo una pequeña sorpresa para ti…<br>
+    Esta vez <b>tú eliges el día</b> y también cómo quieres que sea nuestra cita. ❤️
+  </p>
+
+  <div class="section">
+    <h2>📅 ¿Qué día quieres?</h2>
+    <input id="date" type="date">
+  </div>
+
+  <div class="section">
+    <h2>💕 ¿Qué hacemos?</h2>
+    <div class="plans">
+      <div class="plan" data-plan="Película y cotufas">
+        <div class="emoji">🎬🍿</div><div class="name">Película y cotufas</div>
+        <div class="desc">Manta, peli y mimos.</div>
+      </div>
+      <div class="plan" data-plan="Ver el atardecer">
+        <div class="emoji">🌅</div><div class="name">Ver el atardecer</div>
+        <div class="desc">Un sitio bonito y nosotros.</div>
+      </div>
+      <div class="plan" data-plan="Hamburguesas">
+        <div class="emoji">🍔</div><div class="name">Cenar hamburguesas</div>
+        <div class="desc">Porque una buena hamburguesa nunca falla.</div>
+      </div>
+      <div class="plan" data-plan="Cena en casa con velas y vino">
+        <div class="emoji">🕯️🍷</div><div class="name">Cena en casa</div>
+        <div class="desc">Velas, vino y una noche especial.</div>
+      </div>
+      <div class="plan" data-plan="Noche de arepas">
+        <div class="emoji">🫓❤️</div><div class="name">Noche de arepas</div>
+        <div class="desc">Arepitas, conversación y mucho cariño.</div>
+      </div>
+      <div class="plan" data-plan="Cena romántica fuera de casa">
+        <div class="emoji">🥂🍽️</div><div class="name">Cena romántica</div>
+        <div class="desc">Tú eliges el sitio.</div>
+      </div>
+    </div>
+  </div>
+
+  <button id="confirm" disabled>Confirmar nuestra cita ❤️</button>
+
+  <div id="result">
+    <h2>¡Cita confirmada! 🥹❤️</h2>
+    <div id="summary"></div>
+    <div class="small">Guarda esta fecha, porque ahora tenemos una cita pendiente.</div>
+  </div>
+
+  <div class="footer">Hecha con mucho amor, para nosotros. ♡</div>
+</div>
+
+<script>
+const date = document.getElementById('date');
+const plans = document.querySelectorAll('.plan');
+const confirm = document.getElementById('confirm');
+const result = document.getElementById('result');
+const summary = document.getElementById('summary');
+let selected = '';
+
+const today = new Date();
+today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+date.min = today.toISOString().split('T')[0];
+
+function update(){
+  confirm.disabled = !(date.value && selected);
+}
+date.addEventListener('change', update);
+
+plans.forEach(p=>{
+  p.addEventListener('click', ()=>{
+    plans.forEach(x=>x.classList.remove('selected'));
+    p.classList.add('selected');
+    selected = p.dataset.plan;
+    update();
+  });
+});
+
+confirm.addEventListener('click', ()=>{
+  const d = new Date(date.value + 'T12:00:00');
+  const formatted = new Intl.DateTimeFormat('es-ES',{
+    weekday:'long',day:'numeric',month:'long',year:'numeric'
+  }).format(d);
+  summary.innerHTML = `Nuestra cita será el <b>${formatted}</b>.<br><br>Plan elegido: <b>${selected}</b> 💕`;
+  result.style.display = 'block';
+  result.scrollIntoView({behavior:'smooth',block:'center'});
+});
+</script>
+</body>
+</html>
